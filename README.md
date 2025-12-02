@@ -1,485 +1,367 @@
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>เกมทายสถานการณ์เสี่ยง – แบบมีช้อยส์</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { box-sizing: border-box; font-family: "Sarabun", system-ui, sans-serif; }
-    body {
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #ffecd2, #fcb69f, #f6d365);
-    }
-    .app {
-      background: #ffffffee;
-      backdrop-filter: blur(6px);
-      width: 100%;
-      max-width: 900px;
-      border-radius: 20px;
-      padding: 20px 22px 24px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-    }
-    h1 {
-      margin: 0 0 8px;
-      text-align: center;
-      font-size: 1.6rem;
-      color: #e11d48;
-    }
-    .subtitle {
-      text-align: center;
-      font-size: 0.95rem;
-      color: #4b5563;
-      margin-bottom: 16px;
-    }
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      color: #374151;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .badge {
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .question-card {
-      background: #fffbeb;
-      border-radius: 16px;
-      border: 2px solid #fed7aa;
-      padding: 16px 14px;
-      margin-bottom: 12px;
-    }
-    .question-text {
-      font-size: 1rem;
-      color: #111827;
-      line-height: 1.6;
-    }
-    .choices {
-      margin-top: 12px;
-      display: grid;
-      gap: 8px;
-    }
-    .choice-btn {
-      position: relative;
-      border-radius: 12px;
-      border: none;
-      text-align: left;
-      padding: 10px 12px 10px 42px;
-      font-size: 0.95rem;
-      background: #ecfeff;
-      color: #0f172a;
-      cursor: pointer;
-      transition: transform 0.08s, box-shadow 0.08s, background 0.12s;
-      box-shadow: 0 2px 5px rgba(15,23,42,0.14);
-    }
-    .choice-btn span.label {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #fff;
-    }
-    .label-a { background: #f97316; }
-    .label-b { background: #22c55e; }
-    .label-c { background: #3b82f6; }
-    .label-d { background: #a855f7; }
+<meta charset="UTF-8">
+<title>เกมทายสถานการณ์เสี่ยง – Healthy Hero Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .choice-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(15,23,42,0.18);
-      background: #f0f9ff;
-    }
-    .choice-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 5px rgba(15,23,42,0.14);
-    }
-    .choice-btn[disabled] {
-      opacity: 0.7;
-      cursor: default;
-      transform: none;
-      box-shadow: 0 1px 3px rgba(15,23,42,0.12);
-    }
-    .choice-correct {
-      background: #dcfce7 !important;
-      border: 2px solid #22c55e;
-    }
-    .choice-wrong {
-      background: #fee2e2 !important;
-      border: 2px solid #ef4444;
-    }
+<style>
+/* ฟอนต์และการตั้งค่าเริ่มต้น */
+* { font-family: "Sarabun", sans-serif; box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ffafbd, #ffc3a0, #fff6b7);
+}
 
-    .feedback {
-      display: none;
-      margin-top: 10px;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    .feedback.correct {
-      background: #ecfdf5;
-      color: #166534;
-      border: 1px solid #bbf7d0;
-    }
-    .feedback.wrong {
-      background: #fef2f2;
-      color: #b91c1c;
-      border: 1px solid #fecaca;
-    }
-    .feedback strong {
-      display: block;
-      margin-bottom: 4px;
-    }
+/* กล่องหลัก */
+.container {
+  width: 95%;
+  max-width: 820px;
+  background: #ffffffd9;
+  backdrop-filter: blur(6px);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+  animation: fadeIn .5s ease;
+}
 
-    .btn-row {
-      margin-top: 12px;
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      border-radius: 999px;
-      border: none;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.08s, box-shadow 0.08s, opacity 0.08s;
-    }
-    .btn-primary {
-      background: #2563eb;
-      box-shadow: 0 2px 6px rgba(37,99,235,0.5);
-    }
-    .btn-secondary {
-      background: #6b7280;
-      box-shadow: 0 2px 6px rgba(55,65,81,0.4);
-    }
-    .btn:hover:not([disabled]) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .btn:active:not([disabled]) {
-      transform: translateY(0);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    .btn[disabled] { opacity: 0.6; cursor: default; }
+@keyframes fadeIn {
+  from { opacity:0; transform: scale(0.96); }
+  to { opacity:1; transform: scale(1); }
+}
 
-    .summary {
-      margin-top: 16px;
-      border-top: 1px dashed #e5e7eb;
-      padding-top: 10px;
-      display: none;
-      text-align: center;
-      font-size: 0.95rem;
-      color: #374151;
-    }
-    .summary h2 {
-      margin: 4px 0 6px;
-      font-size: 1.2rem;
-      color: #be123c;
-    }
-    .summary p { margin: 2px 0; }
+/* ส่วนหัว */
+h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #e11d48;
+  margin-top: 0;
+}
 
-    @media (min-width: 640px) {
-      .choices { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
+/* ปุ่ม */
+.btn {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  color: white;
+  transition: .2s;
+}
+
+.btn:hover { transform: scale(1.05); }
+
+.btn-start { background: #ff6b81; }
+.btn-next { background: #1e90ff; }
+.btn-restart { background: #2ed573; }
+
+/* กล่องคำถาม */
+.question-box {
+  background: #fff9db;
+  border: 2px solid #ffd36b;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+/* ช้อยส์ */
+.choice-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 12px 12px 45px;
+  margin: 6px 0;
+  border-radius: 15px;
+  border: none;
+  font-size: 1rem;
+  background: #e8f9fd;
+  color: #222;
+  cursor: pointer;
+  position: relative;
+  transition: .2s;
+}
+
+.choice-btn:hover { background:#d0f1ff; transform: scale(1.03); }
+
+.choice-btn span.label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  background: #ff6b81;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* เมื่อเลือกคำตอบ */
+.correct { background:#d4fcd4 !important; border:2px solid #2ed573; }
+.wrong { background:#ffd7d7 !important; border:2px solid #ff6b6b; }
+
+/* กล่องคำอธิบาย */
+.feedback {
+  display: none;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #ecf0f1;
+}
+
+/* หน้าเริ่มเกม */
+#startScreen { text-align:center; }
+
+#playerInput {
+  width: 75%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid #ff6b81;
+  font-size: 1.1rem;
+}
+
+/* สรุปคะแนน */
+#summaryScreen { display:none; text-align:center; }
+
+.score-box {
+  background:#fff1c1;
+  padding:20px;
+  border-radius:15px;
+  margin-top:15px;
+}
+
+</style>
 </head>
+
 <body>
-  <div class="app">
-    <h1>เกมทายสถานการณ์เสี่ยง</h1>
-    <div class="subtitle">
-      อ่านสถานการณ์ แล้วเลือกคำตอบที่คิดว่า <b>ปลอดภัยและเหมาะสมที่สุด</b> 💡
-    </div>
+<div class="container">
 
-    <div class="status-bar">
-      <div>ข้อที่ <span id="qNumber">1</span> / <span id="qTotal">10</span></div>
-      <div>คะแนน: <span id="score">0</span></div>
-      <div><span class="badge">เวอร์ชันสถานการณ์ + ช้อยส์ A–D</span></div>
-    </div>
+<!-- ⭐ หน้าเริ่มเกม ⭐ -->
+<section id="startScreen">
+  <h1>🎮 เกมทายสถานการณ์เสี่ยง 🎮</h1>
+  <p>พิมพ์ชื่อผู้เล่นก่อนเริ่มเกม</p>
+  <input type="text" id="playerInput" placeholder="เช่น ใบตอง, โฟกัส, พี" />
+  <br><br>
+  <button class="btn btn-start" id="startBtn">เริ่มเกม ▶</button>
+</section>
 
-    <div class="question-card">
-      <div id="questionText" class="question-text">กำลังโหลดคำถาม...</div>
+<!-- ⭐ หน้าคำถาม ⭐ -->
+<section id="gameScreen" style="display:none;">
+  <h1>Healthy Hero 💡</h1>
+  <p style="text-align:center; font-size:1.1rem; color:#d6336c;">
+    ผู้เล่น: <span id="playerName"></span>
+  </p>
 
-      <div class="choices" id="choicesContainer">
-        <!-- ปุ่มช้อยส์จะถูกสร้างด้วย JavaScript -->
-      </div>
+  <p>ข้อที่ <span id="qNumber">1</span> / <span id="qTotal">10</span></p>
+  <p>คะแนน: <span id="score">0</span></p>
 
-      <div id="feedback" class="feedback">
-        <strong id="feedbackTitle"></strong>
-        <span id="feedbackText"></span>
-      </div>
-
-      <div class="btn-row">
-        <button id="restartBtn" class="btn btn-secondary">เริ่มใหม่ 🔁</button>
-        <button id="nextBtn" class="btn btn-primary" disabled>ข้อถัดไป ▶</button>
-      </div>
-    </div>
-
-    <div id="summary" class="summary">
-      <h2>สรุปผลการเล่น</h2>
-      <p>คุณได้คะแนน <span id="finalScore">0</span> จาก <span id="finalTotal">10</span> ข้อ</p>
-      <p id="finalComment"></p>
-    </div>
+  <div class="question-box">
+    <div id="questionText">กำลังโหลด...</div>
   </div>
 
-  <script>
-    // ==== ชุดคำถามแบบสถานการณ์ + ช้อยส์ ====
-    const QUESTIONS = [
-      {
-        text: "1) มีคนแปลกหน้าในโซเชียลทักแชตมาหา และขอให้ส่งรูปตัวเองแบบ “ส่วนตัวมาก ๆ” ให้ดู",
-        choices: [
-          "ส่งรูปไป แต่ไม่ให้เห็นหน้า",
-          "ส่งรูปไปเฉพาะให้คนนี้คนเดียว",
-          "ปฏิเสธ ไม่ส่ง และบล็อก/รายงานบัญชี",
-          "แคปแชตไปโพสต์ประจานในโซเชียลของตัวเอง"
-        ],
-        correctIndex: 2,
-        explain: "การปฏิเสธและบล็อก/รายงานบัญชีเป็นวิธีที่ปลอดภัยที่สุด เพราะการส่งรูปส่วนตัวไม่ว่ารูปแบบใดมีความเสี่ยงต่อการถูกนำไปใช้ในทางที่ไม่เหมาะสมหรือแบล็กเมล์ได้."
-      },
-      {
-        text: "2) เพื่อนสนิทชวนไปบ้านหลังเลิกเรียน โดยบอกว่าพ่อแม่ไม่อยู่บ้าน และมีเพื่อนอีก 1–2 คนไปด้วย",
-        choices: [
-          "ไปโดยไม่บอกใคร เพราะไว้ใจเพื่อน",
-          "ไป แต่แชร์โลเคชันให้คนในบ้านรู้ และกำหนดว่าจะกลับกี่โมง",
-          "ไม่ไปเด็ดขาดทุกกรณี",
-          "ไปและนอนค้างโดยไม่ขออนุญาตผู้ปกครอง"
-        ],
-        correctIndex: 1,
-        explain: "การให้ผู้ปกครองรับรู้ และกำหนดเวลาชัดเจนช่วยลดความเสี่ยงและทำให้มีคนสามารถช่วยเหลือได้หากเกิดเหตุไม่คาดคิด."
-      },
-      {
-        text: "3) แฟนส่งข้อความมาว่า “ถ้ารักกันจริง ต้องยอมทำทุกอย่างที่เราขอ”",
-        choices: [
-          "ยอมทำตาม เพราะกลัวเสียแฟน",
-          "ขอคุยเปิดใจว่าไม่สบายใจกับคำขอนี้ และขอให้เคารพขอบเขตของกันและกัน",
-          "เงียบ ไม่ตอบแล้วปล่อยไปเรื่อย ๆ",
-          "ปรึกษาแต่เพื่อนวัยเดียวกันโดยไม่บอกผู้ใหญ่ที่ไว้ใจได้"
-        ],
-        correctIndex: 1,
-        explain: "การสื่อสารอย่างตรงไปตรงมา และยืนยันขอบเขต (consent) ของตัวเอง เป็นทางเลือกที่เคารพทั้งตนเองและผู้อื่นมากที่สุด."
-      },
-      {
-        text: "4) มีคนในกลุ่มไลน์ส่งคลิปโป๊มา แล้วบอกว่า “ช่วยส่งต่อไปอีกกลุ่มหน่อย จะฮามาก”",
-        choices: [
-          "ส่งต่อให้เพื่อน ๆ อีกหลายกลุ่ม",
-          "ดูเงียบ ๆ คนเดียว แต่ไม่ส่งต่อ",
-          "ขอให้เพื่อนหยุดส่ง และออกจากกลุ่มถ้ายังมีการส่งต่อ",
-          "แคปไปลงสตอรี่ล้อเลียนให้ทุกคนเห็น"
-        ],
-        correctIndex: 2,
-        explain: "การหยุดส่งต่อและบอกให้หยุดพฤติกรรมเป็นการลดการละเมิดและความเสี่ยงทางกฎหมายที่เกี่ยวกับสื่ออนาจาร."
-      },
-      {
-        text: "5) คุณรู้สึกไม่สบายใจเวลามีเพื่อนบางคนชอบแตะตัว หยอกล้อเกินงาม",
-        choices: [
-          "เงียบ แล้วพยายามหลีกเลี่ยงเพื่อนคนนั้น",
-          "หัวเราะกลบเกลื่อน แม้จะไม่สบายใจ",
-          "บอกตรง ๆ ว่า “ไม่ชอบแบบนี้” และขอให้หยุด พร้อมบอกครูที่ไว้ใจได้ถ้ายังไม่หยุด",
-          "แกล้งแตะตัวกลับให้แรงกว่า"
-        ],
-        correctIndex: 2,
-        explain: "การบอกความรู้สึกและขอให้หยุดอย่างชัดเจน พร้อมขอความช่วยเหลือจากผู้ใหญ่หากยังไม่หยุด เป็นการปกป้องขอบเขตของตนเองได้ดีที่สุด."
-      },
-      {
-        text: "6) คุณมีคำถามเกี่ยวกับเรื่องเพศ การคุมกำเนิด และโรคติดต่อทางเพศ",
-        choices: [
-          "เสิร์ชคำถามในเว็บไหนก็ได้ แบบไม่ดูว่าข้อมูลน่าเชื่อถือไหม",
-          "ถามเพื่อนวัยเดียวกัน เพราะเข้าใจเราที่สุด",
-          "ปรึกษาครูอนามัย ครูแนะแนว หรือบุคลากรสาธารณสุข",
-          "ถามคนแปลกหน้าในโซเชียลที่ดูใจดี"
-        ],
-        correctIndex: 2,
-        explain: "ข้อมูลด้านเพศและสุขภาพควรมาจากแหล่งที่เชื่อถือได้ เช่น บุคลากรทางการแพทย์หรือครูที่เกี่ยวข้อง."
-      },
-      {
-        text: "7) ในโซเชียล มีคนมาทักว่าอยากเจอคุณตัวจริง และชวนไปพบที่ห้าง โดยไม่ให้เพื่อนหรือครูรู้",
-        choices: [
-          "ไปคนเดียว เพราะเป็นที่สาธารณะ น่าจะปลอดภัย",
-          "ไปกับเพื่อนหนึ่งคน แต่ไม่บอกผู้ปกครอง",
-          "ปฏิเสธ ไม่ไปพบ และหยุดคุยกับคน ๆ นั้น",
-          "ส่งโลเคชันบ้านให้เขามารับที่หน้าบ้าน"
-        ],
-        correctIndex: 2,
-        explain: "การปฏิเสธไม่ไปพบคนแปลกหน้าและหยุดติดต่อเป็นทางเลือกที่ปลอดภัยที่สุดเพื่อลดความเสี่ยงต่อการถูกหลอกลวง."
-      },
-      {
-        text: "8) เพื่อนบางคนชอบโพสต์รูปตัวเองในลักษณะที่สุ่มเสี่ยงต่อการถูกคอมเมนต์ไม่เหมาะสม แล้วชวนคุณทำตาม",
-        choices: [
-          "ทำตามเพื่อน เพราะกลัวตกเทรนด์",
-          "บอกเพื่อนด้วยความหวังดีว่ามีความเสี่ยง และเลือกไม่โพสต์ลักษณะนั้น",
-          "แอบแคปรูปเพื่อนไปล้อเลียนในกลุ่มอื่น",
-          "ไม่ทำอะไร เพราะคิดว่าเป็นเรื่องส่วนตัวของเพื่อน"
-        ],
-        correctIndex: 1,
-        explain: "การให้คำเตือนด้วยความหวังดี และเลือกไม่ทำพฤติกรรมเสี่ยงตามเพื่อน ช่วยลดโอกาสการถูกละเมิดหรือคอมเมนต์ไม่เหมาะสม."
-      },
-      {
-        text: "9) ในกลุ่มแชต มีคนเริ่มใช้คำพูดล้อเลียนเรื่องเพศสภาพและรสนิยมทางเพศของเพื่อนคนหนึ่ง",
-        choices: [
-          "ร่วมล้อเลียนไปด้วย จะได้เข้ากับกลุ่ม",
-          "เงียบและอ่านผ่านมา โดยไม่แสดงความเห็น",
-          "ช่วยเบรกบรรยากาศ แจ้งเตือนว่าเป็นการล้อเลียนที่กระทบใจ และชวนให้หยุด",
-          "แคปไปส่งต่อให้เพื่อนสนิทข้างนอกเพื่อเมาท์ต่อ"
-        ],
-        correctIndex: 2,
-        explain: "การกล้าเตือนและปกป้องสิทธิของผู้อื่น ช่วยลดการกลั่นแกล้งและสร้างบรรยากาศที่ปลอดภัยในกลุ่ม."
-      },
-      {
-        text: "10) มีคนขอ “รหัสผ่านโซเชียล” ของคุณ โดยอ้างว่า “ถ้าไว้ใจกันต้องให้ดูได้”",
-        choices: [
-          "ให้รหัสผ่านไป เพราะอยากพิสูจน์ว่าไว้ใจได้",
-          "ให้แค่รหัสผ่านบางแอปที่คิดว่าไม่สำคัญ",
-          "ปฏิเสธอย่างสุภาพ และอธิบายว่ารหัสผ่านเป็นเรื่องส่วนตัว",
-          "ให้รหัสไป แล้วไปเปลี่ยนใหม่ทีหลังโดยไม่บอก"
-        ],
-        correctIndex: 2,
-        explain: "รหัสผ่านเป็นข้อมูลส่วนตัว ไม่ควรแบ่งปันให้ใคร การปฏิเสธอย่างสุภาพและชัดเจนเป็นทางเลือกที่ปลอดภัยที่สุด."
-      }
-    ];
+  <div id="choicesContainer"></div>
 
-    let currentIndex = 0;
-    let score = 0;
+  <div id="feedback" class="feedback"></div>
 
-    const qNumberEl = document.getElementById("qNumber");
-    const qTotalEl = document.getElementById("qTotal");
-    const scoreEl = document.getElementById("score");
-    const questionTextEl = document.getElementById("questionText");
-    const choicesContainer = document.getElementById("choicesContainer");
-    const feedbackEl = document.getElementById("feedback");
-    const feedbackTitleEl = document.getElementById("feedbackTitle");
-    const feedbackTextEl = document.getElementById("feedbackText");
-    const nextBtn = document.getElementById("nextBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const summaryEl = document.getElementById("summary");
-    const finalScoreEl = document.getElementById("finalScore");
-    const finalTotalEl = document.getElementById("finalTotal");
-    const finalCommentEl = document.getElementById("finalComment");
+  <br>
+  <button class="btn btn-next" id="nextBtn" disabled>ข้อถัดไป ▶</button>
+</section>
 
-    qTotalEl.textContent = QUESTIONS.length;
+<!-- ⭐ หน้าสรุปคะแนน ⭐ -->
+<section id="summaryScreen">
+  <h1>🎉 ผลสรุปของเกม 🎉</h1>
+  <p style="font-size:1.3rem;">ผู้เล่น: <b><span id="finalName"></span></b></p>
 
-    function renderQuestion() {
-      const q = QUESTIONS[currentIndex];
-      qNumberEl.textContent = currentIndex + 1;
-      questionTextEl.textContent = q.text;
-      choicesContainer.innerHTML = "";
-      feedbackEl.style.display = "none";
-      nextBtn.disabled = true;
+  <div class="score-box">
+    <h2>คะแนนรวม: <span id="finalScore"></span> / <span id="finalTotal"></span></h2>
+    <p id="finalComment" style="font-size:1.1rem;"></p>
+  </div>
 
-      const labelClasses = ["label-a","label-b","label-c","label-d"];
-      const labelTexts = ["A","B","C","D"];
+  <br>
+  <button class="btn btn-restart" id="restartBtn">เล่นอีกครั้ง 🔁</button>
+</section>
 
-      q.choices.forEach((choiceText, index) => {
-        const btn = document.createElement("button");
-        btn.className = "choice-btn";
-        btn.dataset.index = index;
+</div>
 
-        const label = document.createElement("span");
-        label.className = `label ${labelClasses[index]}`;
-        label.textContent = labelTexts[index];
+<script>
+// =======================
+// ชุดคำถาม
+// =======================
+const QUESTIONS = [
+  {
+    text: "มีคนแปลกหน้าขอรูปส่วนตัวในโซเชียล",
+    choices: [
+      "ส่งรูปให้โดยไม่เห็นหน้า",
+      "ส่งรูปเฉพาะเขาคนเดียว",
+      "ปฏิเสธ บล็อก และรายงานบัญชี",
+      "โพสต์ประจานลงโซเชียล"
+    ],
+    correct: 2,
+    explain: "การบล็อกและรายงานเป็นวิธีที่ปลอดภัยที่สุด"
+  },
+  {
+    text: "เพื่อนชวนไปบ้านตอนพ่อแม่ไม่อยู่",
+    choices: [
+      "ไปโดยไม่บอกใคร",
+      "ไปแต่แชร์โลเคชันให้ที่บ้านรู้",
+      "ไม่ไปเด็ดขาด",
+      "ไปนอนค้างโดยไม่ขออนุญาต"
+    ],
+    correct: 1,
+    explain: "ควรบอกผู้ปกครองและกำหนดเวลาชัดเจน"
+  },
+  {
+    text: "แฟนพูดว่า “ถ้ารักกันต้องยอมทุกอย่าง”",
+    choices: [
+      "ยอมทำตาม",
+      "คุยและตั้งขอบเขตอย่างชัดเจน",
+      "เงียบไม่ตอบ",
+      "ปรึกษาเพื่อนวัยเดียวกันเท่านั้น"
+    ],
+    correct: 1,
+    explain: "ต้องเคารพขอบเขตซึ่งกันและกันเสมอ"
+  },
+  {
+    text: "เพื่อนส่งคลิปโป๊ในไลน์และให้ช่วยส่งต่อ",
+    choices: [
+      "ส่งต่อให้หลายกลุ่ม",
+      "ดูคนเดียวแล้วเก็บไว้",
+      "เตือนเพื่อนและออกจากกลุ่มหากยังส่งต่อ",
+      "แคปลงสตอรี่"
+    ],
+    correct: 2,
+    explain: "หยุดส่งต่อคือการลดความเสี่ยงและผิดกฎหมาย"
+  }
+];
 
-        const spanText = document.createElement("span");
-        spanText.textContent = choiceText;
+let index = 0;
+let score = 0;
+const total = QUESTIONS.length;
+document.getElementById("qTotal").textContent = total;
 
-        btn.appendChild(label);
-        btn.appendChild(spanText);
+// =======================
+// เริ่มเกม
+// =======================
+document.getElementById("startBtn").onclick = () => {
+  const name = document.getElementById("playerInput").value.trim();
+  if (name === "") { alert("กรุณากรอกชื่อ"); return; }
 
-        btn.addEventListener("click", () => handleChoice(btn, index));
+  document.getElementById("playerName").textContent = name;
 
-        choicesContainer.appendChild(btn);
-      });
-    }
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
 
-    function handleChoice(button, chosenIndex) {
-      // ปิดการคลิกทุกช้อยส์
-      const allButtons = choicesContainer.querySelectorAll(".choice-btn");
-      allButtons.forEach(btn => btn.disabled = true);
+  loadQuestion();
+};
 
-      const q = QUESTIONS[currentIndex];
-      const isCorrect = (chosenIndex === q.correctIndex);
+// =======================
+// โหลดคำถาม
+// =======================
+function loadQuestion() {
+  const q = QUESTIONS[index];
+  document.getElementById("qNumber").textContent = index + 1;
+  document.getElementById("questionText").textContent = q.text;
 
-      if (isCorrect) {
-        score++;
-        scoreEl.textContent = score;
-        feedbackEl.className = "feedback correct";
-        feedbackTitleEl.textContent = "ตอบถูก ✔";
-      } else {
-        feedbackEl.className = "feedback wrong";
-        feedbackTitleEl.textContent = "ยังไม่เหมาะสมที่สุด ✘";
-      }
-      feedbackTextEl.textContent = q.explain;
-      feedbackEl.style.display = "block";
+  const choicesContainer = document.getElementById("choicesContainer");
+  choicesContainer.innerHTML = "";
 
-      // ไฮไลต์คำตอบที่เลือก และคำตอบที่ถูก
-      allButtons.forEach((btn, idx) => {
-        if (idx === q.correctIndex) {
-          btn.classList.add("choice-correct");
-        }
-        if (idx === chosenIndex && !isCorrect) {
-          btn.classList.add("choice-wrong");
-        }
-      });
+  document.getElementById("feedback").style.display = "none";
+  document.getElementById("nextBtn").disabled = true;
 
-      nextBtn.disabled = false;
-    }
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.innerHTML = `<span class="label">${String.fromCharCode(65 + i)}</span> ${c}`;
+    btn.onclick = () => checkAnswer(btn, i);
+    choicesContainer.appendChild(btn);
+  });
+}
 
-    function showSummary() {
-      finalScoreEl.textContent = score;
-      finalTotalEl.textContent = QUESTIONS.length;
-      const ratio = score / QUESTIONS.length;
-      let comment = "";
-      if (ratio >= 0.8) {
-        comment = "ยอดเยี่ยม! คุณประเมินสถานการณ์และตัดสินใจได้เหมาะสมมาก";
-      } else if (ratio >= 0.5) {
-        comment = "ทำได้ดีพอสมควร ลองทบทวนคำอธิบายเพื่อพัฒนาทักษะการตัดสินใจให้ดียิ่งขึ้น";
-      } else {
-        comment = "ยังมีหลายสถานการณ์ที่อาจมองข้ามความเสี่ยง ลองอ่านคำอธิบายประกอบเพื่อช่วยให้ปลอดภัยมากขึ้นในชีวิตจริง";
-      }
-      finalCommentEl.textContent = comment;
-      summaryEl.style.display = "block";
-    }
+// =======================
+// ตรวจคำตอบ
+// =======================
+function checkAnswer(btn, chosenIndex) {
+  const q = QUESTIONS[index];
+  const allButtons = document.querySelectorAll(".choice-btn");
 
-    nextBtn.addEventListener("click", () => {
-      if (currentIndex < QUESTIONS.length - 1) {
-        currentIndex++;
-        renderQuestion();
-      } else {
-        showSummary();
-      }
-    });
+  allButtons.forEach(b => b.disabled = true);
 
-    restartBtn.addEventListener("click", () => {
-      currentIndex = 0;
-      score = 0;
-      scoreEl.textContent = score;
-      summaryEl.style.display = "none";
-      renderQuestion();
-    });
+  const feedback = document.getElementById("feedback");
 
-    // เริ่มต้น
-    renderQuestion();
-  </script>
+  if (chosenIndex === q.correct) {
+    score++;
+    feedback.className = "feedback correct";
+    feedback.innerHTML = "✔ ตอบถูก!<br>" + q.explain;
+    btn.classList.add("correct");
+  } else {
+    feedback.className = "feedback wrong";
+    feedback.innerHTML = "✘ ยังไม่ใช่คำตอบที่ดีที่สุด<br>" + q.explain;
+    btn.classList.add("wrong");
+
+    // ไฮไลต์คำตอบที่ถูกต้อง
+    allButtons[q.correct].classList.add("correct");
+  }
+
+  feedback.style.display = "block";
+  document.getElementById("score").textContent = score;
+  document.getElementById("nextBtn").disabled = false;
+}
+
+// =======================
+// ปุ่มถัดไป
+// =======================
+document.getElementById("nextBtn").onclick = () => {
+  index++;
+  if (index < QUESTIONS.length) {
+    loadQuestion();
+  } else {
+    showSummary();
+  }
+};
+
+// =======================
+// สรุปผลคะแนน
+// =======================
+function showSummary() {
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("summaryScreen").style.display = "block";
+
+  document.getElementById("finalName").textContent =
+    document.getElementById("playerName").textContent;
+
+  document.getElementById("finalScore").textContent = score;
+  document.getElementById("finalTotal").textContent = total;
+
+  let comment = "";
+  const ratio = score / total;
+
+  if (ratio >= 0.8) comment = "เยี่ยมมาก! คุณวิเคราะห์ความเสี่ยงได้ดีมาก 👍";
+  else if (ratio >= 0.5)
+    comment = "ทำได้ดี แต่ยังพัฒนาได้อีก ลองอ่านคำอธิบายเพิ่มนะ 💡";
+  else comment = "ควรทบทวนสถานการณ์เพื่อเพิ่มความปลอดภัยในชีวิตจริง ⚠";
+
+  document.getElementById("finalComment").textContent = comment;
+}
+
+// =======================
+// เริ่มใหม่
+// =======================
+document.getElementById("restartBtn").onclick = () => {
+  index = 0;
+  score = 0;
+  document.getElementById("score").textContent = score;
+  document.getElementById("summaryScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  loadQuestion();
+};
+
+</script>
+
 </body>
 </html>
