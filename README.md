@@ -2,7 +2,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Think Before You Risk — คิดก่อนเสี่ยง</title>
+  <title>Think Before You Risk — เกมทดสอบทักษะการคิดและการตัดสินใจ</title>
+
+  <meta name="description" content="Think Before You Risk — เกมทดสอบทักษะการคิดและการตัดสินใจ เพื่อเอาตัวรอดจากความเสี่ยงในโลกจริงและโลกออนไลน์">
+  <meta property="og:title" content="Think Before You Risk — คิดก่อนเสี่ยง">
+  <meta property="og:description" content="เกมทดสอบทักษะการคิดและการตัดสินใจ เพื่อเอาตัวรอดจากความเสี่ยงในโลกจริงและโลกออนไลน์">
+  <meta property="og:type" content="website">
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -59,7 +64,7 @@
 
       <div>
         <h1 class="text-2xl font-bold">Think Before You Risk</h1>
-        <p class="text-sm opacity-90">คิดก่อนเสี่ยง — เกมเช็กสกิลการตัดสินใจกับสถานการณ์เสี่ยงในชีวิตจริงและออนไลน์</p>
+        <p class="text-sm opacity-90">เกมทดสอบทักษะการคิดและการตัดสินใจ เพื่อเอาตัวรอดจากความเสี่ยงในโลกจริงและโลกออนไลน์</p>
       </div>
 
       <div class="ml-auto text-right text-sm opacity-90">
@@ -82,7 +87,7 @@
   <div id="confetti-root" style="position:fixed; inset:0; pointer-events:none;"></div>
 
 <script>
-/* ====== QUESTIONS (same as before) ====== */
+/* ====== QUESTIONS (unchanged content) ====== */
 const QUESTIONS = [
   {id:1,text:"คุณได้รับข้อความจากคนไม่รู้จักในโซเชียลว่า 'ฉันมีของดีจะให้ดู' พร้อมลิงก์ คุณจะทำอย่างไร?",choices:[
     {text:"ไม่คลิกลิงก์ และบล็อก/รายงานผู้ส่ง",score:2,explain:"ลิงก์จากคนไม่รู้จักอาจเป็นฟิชชิ่งหรือมัลแวร์ — ปลอดภัยที่สุดคือตัดการติดต่อ"},
@@ -166,7 +171,7 @@ function renderStart(){
         </div>
 
         <div class="mt-6 text-sm text-slate-500">
-          <strong>คำแนะนำ:</strong> คะแนนแต่ละข้อ: ปลอดภัย=2, กลาง=1, เสี่ยง=0 — เมื่อจบเกมจะมีคำแนะนำเพิ่มเติม
+          <strong>คำแนะนำ:</strong> เลือกตัวเลือกที่คุณคิดว่าเหมาะสมที่สุด — เมื่อจบเกมจะมีคำแนะนำเชิงปฏิบัติให้
         </div>
       </div>
 
@@ -239,7 +244,6 @@ function renderQuestion(index){
   const q = QUESTIONS[index-1];
   if(!q) return renderResults();
 
-  const answeredScore = state.answers.reduce((s,a)=>s+a.score,0);
   const progressPct = Math.round(((index-1)/QUESTIONS.length)*100);
 
   container.innerHTML = `
@@ -266,7 +270,7 @@ function renderQuestion(index){
             <div class="flex items-center justify-between">
               <div class="min-w-0">
                 <div class="text-sm font-medium text-slate-800">${escapeHtml(c.text)}</div>
-                <div class="text-xs text-slate-400 mt-1">คะแนน ${c.score}</div>
+                <div class="text-xs text-slate-400 mt-1">ตัวเลือก ${i+1}</div>
               </div>
               <div class="text-2xl opacity-80">${i===0? '🟢' : i===1? '🟡' : '🔴'}</div>
             </div>
@@ -276,7 +280,7 @@ function renderQuestion(index){
 
       <div class="flex items-center justify-between">
         <button id="btn-back" class="px-4 py-2 rounded-xl border">ย้อนกลับ</button>
-        <div class="text-sm text-slate-500">คะแนนปัจจุบัน: <strong class="text-slate-700">${answeredScore}</strong></div>
+        <div class="text-sm text-slate-500">คำตอบที่เลือกแล้ว: <strong class="text-slate-700">${state.answers.length}</strong></div>
       </div>
     </div>
   `;
@@ -301,11 +305,12 @@ function renderQuestion(index){
 }
 
 function renderResults(){
+  // compute total internally but do NOT display numeric score
   const total = state.answers.reduce((s,a)=>s+a.score,0);
   const max = QUESTIONS.length * 2;
   const pct = Math.round((total/max)*100);
 
-  // feedback
+  // feedback label (no numbers shown)
   let title, adv;
   if(total <= 6){
     title = "เสี่ยงสูง — ควรปรับปรุง";
@@ -326,8 +331,8 @@ function renderResults(){
           <p class="text-sm text-slate-500">ผู้เล่น: <strong>${escapeHtml(state.name||'ไม่ระบุ')}</strong></p>
         </div>
         <div class="text-right">
-          <div class="text-4xl font-extrabold" style="background:linear-gradient(90deg,#f97316,#ef4444); -webkit-background-clip:text; color:transparent;">${total}/${max}</div>
-          <div class="text-sm text-slate-500">${pct}%</div>
+          <div class="text-lg font-extrabold" style="background:linear-gradient(90deg,#f97316,#ef4444); -webkit-background-clip:text; color:transparent;">${title}</div>
+          <div class="text-xs text-slate-500 mt-1">ประเมินเชิงคุณภาพ (ไม่แสดงคะแนนตัวเลข)</div>
         </div>
       </div>
 
@@ -337,7 +342,7 @@ function renderResults(){
             <div class="text-3xl">🎉</div>
           </div>
           <div>
-            <div class="font-semibold text-slate-800">${title}</div>
+            <div class="font-semibold text-slate-800">ข้อเสนอแนะ</div>
             <div class="text-sm text-slate-600 mt-1">คำแนะนำที่ควรศึกษาเพิ่มเติม:</div>
             <ul class="mt-2 text-sm text-slate-600 list-disc list-inside">
               ${adv.map(it=>`<li>${escapeHtml(it)}</li>`).join('')}
@@ -352,7 +357,6 @@ function renderResults(){
           ${QUESTIONS.map((q,idx)=>{
             const ans = state.answers.find(a=>a.qid===q.id);
             const chosen = ans ? q.choices[ans.choiceIndex] : null;
-            const badge = chosen ? (chosen.score===2? 'bg-green-50 text-green-700':'') + (chosen.score===1?' bg-amber-50 text-amber-700':'') : 'bg-red-50 text-red-700';
             return `
               <div class="border-b border-slate-100 pb-3">
                 <div class="text-sm font-medium">${idx+1}. ${escapeHtml(q.text)}</div>
@@ -366,23 +370,24 @@ function renderResults(){
 
       <div class="flex gap-3">
         <button id="btn-retry" class="btn-primary px-4 py-3 rounded-xl">เล่นอีกครั้ง</button>
-        <button id="btn-share" class="px-4 py-3 rounded-xl border">คัดลอกผล</button>
+        <button id="btn-share" class="px-4 py-3 rounded-xl border">คัดลอกสรุป</button>
         <button id="btn-home" class="px-4 py-3 rounded-xl border">กลับหน้าหลัก</button>
       </div>
     </div>
   `;
 
-  // play confetti if good
+  // confetti for decent performance (still internal logic uses numeric but we don't show)
   if(pct >= 50){
-    launchConfetti(32);
+    launchConfetti(28);
   }
 
   document.getElementById('btn-retry').onclick = ()=>{ state.answers=[]; state.current=1; renderQuestion(1); }
   document.getElementById('btn-home').onclick = ()=>{ state.current=0; renderStart(); }
   document.getElementById('btn-share').onclick = ()=>{
-    const share = `ThinkBeforeYouRisk | ผู้เล่น:${state.name||'ไม่ระบุ'} | คะแนน:${total}/${max} (${pct}%)`;
-    copyTextToClipboard(share);
-    alert('คัดลอกข้อความสรุปแล้ว: ' + share);
+    // share qualitative summary only (no numeric score shown)
+    const summary = `ThinkBeforeYouRisk | ผู้เล่น:${state.name||'ไม่ระบุ'} | ผล: ${title}`;
+    copyTextToClipboard(summary);
+    alert('คัดลอกข้อความสรุปแล้ว: ' + summary);
   }
 }
 
@@ -411,7 +416,6 @@ function launchConfetti(count=24){
     el.style.opacity = (0.7 + Math.random()*0.3);
     el.style.animationDuration = (1400 + Math.random()*1200) + 'ms';
     root.appendChild(el);
-    // remove later
     setTimeout(()=> el.remove(), 3500);
   }
 }
